@@ -128,7 +128,7 @@ function PoolApp({ subpath, inviteCode }) {
     case 'bracket':
       return <BracketView pool={pool} teams={teams} results={results} onNavigate={navigatePool} />;
     default:
-      return <PoolHomeView pool={pool} entries={entries} onNavigate={navigatePool} inviteCode={inviteCode} />;
+      return <PoolHomeView pool={pool} entries={entries} teams={teams} results={results} onNavigate={navigatePool} inviteCode={inviteCode} />;
   }
 }
 
@@ -199,8 +199,9 @@ function LandingPage() {
 }
 
 // Pool home view
-function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
+function PoolHomeView({ pool, entries, teams, results, onNavigate, inviteCode }) {
   const [copied, setCopied] = useState(false);
+  const [showBracket, setShowBracket] = useState(false);
   const isLocked = pool?.status === 'locked';
 
   const copyShareLink = () => {
@@ -209,6 +210,55 @@ function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // When locked, show leaderboard directly
+  if (isLocked) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-4">
+            <div className="text-4xl mb-2">🏈</div>
+            <h1 className="text-2xl font-bold text-gray-800">{pool?.name || 'NFL Playoff Pool'}</h1>
+            <p className="text-gray-500">{pool?.season} Confidence Rankings</p>
+          </div>
+
+          {/* Toggle buttons */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setShowBracket(false)}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+                !showBracket ? 'bg-green-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              📊 Leaderboard
+            </button>
+            <button
+              onClick={() => setShowBracket(true)}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition ${
+                showBracket ? 'bg-green-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              🏆 Bracket
+            </button>
+          </div>
+
+          {showBracket ? (
+            <Card>
+              <PlayoffBracket teams={teams} results={results} />
+            </Card>
+          ) : (
+            <>
+              <p className="text-sm text-gray-600 mb-4">
+                Click on any entry to see their picks.
+              </p>
+              <Leaderboard entries={entries} results={results} teams={teams} />
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Unlocked - show normal home with submit option
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-900 to-green-800 p-4">
       <div className="max-w-md mx-auto">
@@ -218,31 +268,17 @@ function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
           <p className="text-green-200">{pool?.season} Confidence Rankings</p>
         </div>
 
-        {isLocked ? (
-          <Card variant="dark" className="mb-6">
-            <div className="text-center">
-              <div className="text-3xl mb-2">🔒</div>
-              <p className="text-yellow-300 font-semibold">Submissions Closed</p>
-              <p className="text-green-200 text-sm mt-1">
-                The playoffs have started. View the leaderboard to see standings!
-              </p>
-            </div>
-          </Card>
-        ) : (
-          <Card variant="dark" className="mb-6">
-            <p className="text-green-100 text-sm">
-              Assign points 1-14 to each playoff team. When a team wins, you earn those points!
-              Higher points = more confidence in that team winning.
-            </p>
-          </Card>
-        )}
+        <Card variant="dark" className="mb-6">
+          <p className="text-green-100 text-sm">
+            Assign points 1-14 to each playoff team. When a team wins, you earn those points!
+            Higher points = more confidence in that team winning.
+          </p>
+        </Card>
 
         <div className="space-y-3 mb-6">
-          {!isLocked && (
-            <Button fullWidth onClick={() => onNavigate('submit')}>
-              Submit My Picks
-            </Button>
-          )}
+          <Button fullWidth onClick={() => onNavigate('submit')}>
+            Submit My Picks
+          </Button>
 
           <Button variant="secondary" fullWidth onClick={() => onNavigate('leaderboard')}>
             Leaderboard
@@ -257,14 +293,12 @@ function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
           </Button>
         </div>
 
-        {!isLocked && (
-          <Card variant="dark">
-            <p className="text-green-200 text-sm mb-2">Share this pool:</p>
-            <Button variant="secondary" fullWidth onClick={copyShareLink}>
-              {copied ? '✓ Link Copied!' : '📋 Copy Share Link'}
-            </Button>
-          </Card>
-        )}
+        <Card variant="dark">
+          <p className="text-green-200 text-sm mb-2">Share this pool:</p>
+          <Button variant="secondary" fullWidth onClick={copyShareLink}>
+            {copied ? '✓ Link Copied!' : '📋 Copy Share Link'}
+          </Button>
+        </Card>
       </div>
     </div>
   );
