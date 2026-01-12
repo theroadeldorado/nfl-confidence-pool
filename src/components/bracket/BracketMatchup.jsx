@@ -1,4 +1,5 @@
 import React from 'react';
+import { TeamLogo } from '../../constants/teamAbbreviations';
 
 export const BracketMatchup = ({
   homeTeam,
@@ -8,29 +9,29 @@ export const BracketMatchup = ({
   showSeeds = true,
 }) => {
   const getTeamStyle = (team) => {
-    if (!team) return 'bg-gray-100 text-gray-400';
-    if (winner === team.name) return 'bg-green-100 border-green-500 text-green-800 font-bold';
-    if (winner && winner !== team.name) return 'bg-gray-100 text-gray-400 line-through';
+    if (!team) return 'bg-gray-100';
+    if (winner === team.name) return 'bg-green-100 border-green-500';
+    if (winner && winner !== team.name) return 'bg-gray-100 opacity-30';
     return 'bg-white';
   };
 
   const TeamSlot = ({ team, isHome }) => (
     <div
       className={`
-        px-3 py-2 border-l-4 rounded-r
+        px-2 py-2 border-l-4 rounded-r flex items-center gap-2
         ${team ? getTeamStyle(team) : 'bg-gray-50 border-gray-200'}
         ${team && winner === team.name ? 'border-green-500' : 'border-gray-300'}
       `}
     >
       {team ? (
-        <div className="flex items-center justify-between">
-          <span className="truncate">
-            {showSeeds && <span className="text-gray-400 text-xs mr-1">#{team.seed}</span>}
-            {team.name}
-          </span>
-        </div>
+        <>
+          {showSeeds && (
+            <span className="text-gray-400 text-xs font-bold w-5">#{team.seed}</span>
+          )}
+          <TeamLogo teamName={team.name} size={32} />
+        </>
       ) : (
-        <span className="text-gray-400 italic">TBD</span>
+        <span className="text-gray-400 italic text-sm">TBD</span>
       )}
     </div>
   );

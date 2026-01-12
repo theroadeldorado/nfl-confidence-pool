@@ -11,6 +11,7 @@ import { PlayoffBracket } from './components/bracket/PlayoffBracket';
 import { Leaderboard } from './components/leaderboard/Leaderboard';
 import { AdminLogin } from './components/admin/AdminLogin';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { TeamLogo } from './constants/teamAbbreviations';
 
 // Parse current URL path
 const getPathInfo = () => {
@@ -473,6 +474,7 @@ function SubmitView({ pool, teams, entries, onNavigate, inviteCode }) {
                   className="w-14 p-2 border-2 border-gray-200 rounded mr-3 text-center font-bold focus:border-green-500 outline-none"
                   placeholder="#"
                 />
+                <TeamLogo teamName={team.name} size={36} className="mr-3" />
                 <div className="flex-1">
                   <span className="font-medium">{team.name}</span>
                   <span className="text-gray-400 text-sm ml-2">#{team.seed} seed</span>
@@ -501,6 +503,7 @@ function SubmitView({ pool, teams, entries, onNavigate, inviteCode }) {
                   className="w-14 p-2 border-2 border-gray-200 rounded mr-3 text-center font-bold focus:border-green-500 outline-none"
                   placeholder="#"
                 />
+                <TeamLogo teamName={team.name} size={36} className="mr-3" />
                 <div className="flex-1">
                   <span className="font-medium">{team.name}</span>
                   <span className="text-gray-400 text-sm ml-2">#{team.seed} seed</span>
@@ -678,8 +681,11 @@ function ResultsView({ pool, teams, entries, results, onNavigate }) {
                 {(teams?.afc || []).map((team, i) => (
                   <tr key={team.name} className={i % 2 === 0 ? 'bg-red-50/50' : 'bg-white'}>
                     <td className="p-2 font-medium sticky left-0 bg-inherit whitespace-nowrap">
-                      <span className="text-gray-400 text-xs mr-1">#{team.seed}</span>
-                      {team.name}
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400 text-xs">#{team.seed}</span>
+                        <TeamLogo teamName={team.name} size={24} />
+                        <span>{team.name}</span>
+                      </div>
                     </td>
                     {entryList.map(([entryName, data]) => {
                       const pts = data.rankings?.[team.name];
@@ -706,8 +712,11 @@ function ResultsView({ pool, teams, entries, results, onNavigate }) {
                 {(teams?.nfc || []).map((team, i) => (
                   <tr key={team.name} className={i % 2 === 0 ? 'bg-blue-50/50' : 'bg-white'}>
                     <td className="p-2 font-medium sticky left-0 bg-inherit whitespace-nowrap">
-                      <span className="text-gray-400 text-xs mr-1">#{team.seed}</span>
-                      {team.name}
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-400 text-xs">#{team.seed}</span>
+                        <TeamLogo teamName={team.name} size={24} />
+                        <span>{team.name}</span>
+                      </div>
                     </td>
                     {entryList.map(([entryName, data]) => {
                       const pts = data.rankings?.[team.name];

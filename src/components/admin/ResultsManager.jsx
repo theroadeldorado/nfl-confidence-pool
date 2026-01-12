@@ -5,7 +5,7 @@ import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { calculateScore } from '../../utils/scoring';
 import { ROUNDS } from '../../constants/rounds';
-import { getTeamInfo } from '../../constants/teamAbbreviations';
+import { getTeamInfo, TeamLogo } from '../../constants/teamAbbreviations';
 
 export const ResultsManager = ({ poolId }) => {
   const [teams, setTeams] = useState({ afc: [], nfc: [] });
@@ -185,7 +185,7 @@ export const ResultsManager = ({ poolId }) => {
       <button
         onClick={onClick}
         className={`
-          flex-1 p-3 rounded font-bold text-sm transition-all
+          flex-1 p-2 rounded font-bold text-sm transition-all flex items-center justify-center gap-2
           ${isSelected
             ? `ring-4 ${confColor} shadow-lg scale-105`
             : 'hover:scale-102 hover:shadow-md opacity-80 hover:opacity-100'}
@@ -195,8 +195,9 @@ export const ResultsManager = ({ poolId }) => {
           color: info.textColor,
         }}
       >
-        {info.abbr}
-        {isSelected && <span className="ml-2">✓</span>}
+        <TeamLogo teamName={team} size={28} />
+        <span>{info.abbr}</span>
+        {isSelected && <span>✓</span>}
       </button>
     );
   };

@@ -1,43 +1,44 @@
 import React, { useState } from 'react';
 import { useLeaderboard } from '../../hooks/useLeaderboard';
-import { getTeamInfo } from '../../constants/teamAbbreviations';
+import { getTeamInfo, TeamLogo } from '../../constants/teamAbbreviations';
+import { getTeamsWhoLost } from '../../utils/scoring';
 
 const TeamBadge = ({ teamName, points, isEliminated }) => {
   const info = getTeamInfo(teamName);
 
   return (
     <div
-      className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold"
+      className="flex flex-col md:flex-row justify-center items-center gap-1 md:gap-2 px-2 py-1.5 rounded-lg"
       style={{
         backgroundColor: info.color,
-        color: info.textColor,
         opacity: isEliminated ? 0.3 : 1,
       }}
       title={`${teamName}: ${points} pts${isEliminated ? ' (Eliminated)' : ''}`}
     >
-      <span>{info.abbr}</span>
-      <span className="bg-white/30 px-1 rounded text-[10px]">
+      <TeamLogo teamName={teamName} size={32} />
+      <span
+        className="bg-white/30 px-2 py-0.5 rounded text-sm font-bold"
+        style={{ color: info.textColor }}
+      >
         {points}
       </span>
     </div>
   );
 };
 
-const ExpandedPicks = ({ rankings, teams }) => {
-  const allTeams = [...(teams?.afc || []), ...(teams?.nfc || [])];
-
+const ExpandedPicks = ({ rankings, teams, results }) => {
   // Sort by points (highest first)
   const sortedPicks = Object.entries(rankings || {})
     .sort((a, b) => b[1] - a[1]);
 
-  const getTeamData = (teamName) => allTeams.find(t => t.name === teamName);
+  // Get eliminated teams from results
+  const eliminatedTeams = getTeamsWhoLost(results, teams);
 
   return (
     <div className="mt-3 pt-3 border-t border-gray-200">
-      <div className="flex flex-wrap gap-1.5">
+      <div className="grid grid-cols-7 gap-2">
         {sortedPicks.map(([teamName, points]) => {
-          const teamData = getTeamData(teamName);
-          const isEliminated = teamData?.eliminated;
+          const isEliminated = eliminatedTeams.has(teamName);
 
           return (
             <TeamBadge
@@ -113,6 +114,7 @@ const LeaderboardEntry = ({ entry, rank, teams, results, isExpanded, onToggle })
           <ExpandedPicks
             rankings={entry.rankings}
             teams={teams}
+            results={results}
           />
         </div>
       )}

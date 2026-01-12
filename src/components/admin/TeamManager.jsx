@@ -3,6 +3,7 @@ import { database } from '../../firebase';
 import { ref, onValue, update } from 'firebase/database';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
+import { TeamLogo } from '../../constants/teamAbbreviations';
 
 export const TeamManager = ({ poolId }) => {
   const [teams, setTeams] = useState({ afc: [], nfc: [] });
@@ -78,6 +79,7 @@ export const TeamManager = ({ poolId }) => {
     return (
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-500 w-8 text-center font-bold">#{seed}</span>
+        <TeamLogo teamName={team.name} size={32} />
         <input
           type="text"
           value={team.name}
