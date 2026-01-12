@@ -150,3 +150,4 @@ export const Leaderboard = ({ entries, results, teams }) => {
     </div>
   );
 };
+
