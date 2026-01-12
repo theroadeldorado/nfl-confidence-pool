@@ -64,6 +64,15 @@ export const PoolManager = ({ selectedPoolId, onSelectPool }) => {
     navigator.clipboard.writeText(link);
   };
 
+  const togglePoolStatus = async (poolId, currentStatus) => {
+    const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
+    try {
+      await update(ref(database, `pools/${poolId}`), { status: newStatus });
+    } catch (error) {
+      console.error('Error toggling pool status:', error);
+    }
+  };
+
   if (loading) {
     return <div className="text-center py-8">Loading pools...</div>;
   }
@@ -120,14 +129,16 @@ export const PoolManager = ({ selectedPoolId, onSelectPool }) => {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`
-                      px-2 py-1 text-xs rounded-full
-                      ${pool.status === 'active' ? 'bg-green-100 text-green-700' :
-                        pool.status === 'locked' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'}
-                    `}>
-                      {pool.status}
-                    </span>
+                    <Button
+                      size="sm"
+                      variant={pool.status === 'locked' ? 'success' : 'danger'}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        togglePoolStatus(poolId, pool.status);
+                      }}
+                    >
+                      {pool.status === 'locked' ? '🔓 Unlock' : '🔒 Lock'}
+                    </Button>
                     <Button
                       size="sm"
                       variant="ghost"

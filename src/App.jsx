@@ -201,6 +201,7 @@ function LandingPage() {
 // Pool home view
 function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
   const [copied, setCopied] = useState(false);
+  const isLocked = pool?.status === 'locked';
 
   const copyShareLink = () => {
     navigator.clipboard.writeText(`${window.location.origin}/pool/${inviteCode}`);
@@ -217,17 +218,31 @@ function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
           <p className="text-green-200">{pool?.season} Confidence Rankings</p>
         </div>
 
-        <Card variant="dark" className="mb-6">
-          <p className="text-green-100 text-sm">
-            Assign points 1-14 to each playoff team. When a team wins, you earn those points!
-            Higher points = more confidence in that team winning.
-          </p>
-        </Card>
+        {isLocked ? (
+          <Card variant="dark" className="mb-6">
+            <div className="text-center">
+              <div className="text-3xl mb-2">🔒</div>
+              <p className="text-yellow-300 font-semibold">Submissions Closed</p>
+              <p className="text-green-200 text-sm mt-1">
+                The playoffs have started. View the leaderboard to see standings!
+              </p>
+            </div>
+          </Card>
+        ) : (
+          <Card variant="dark" className="mb-6">
+            <p className="text-green-100 text-sm">
+              Assign points 1-14 to each playoff team. When a team wins, you earn those points!
+              Higher points = more confidence in that team winning.
+            </p>
+          </Card>
+        )}
 
         <div className="space-y-3 mb-6">
-          <Button fullWidth onClick={() => onNavigate('submit')}>
-            Submit My Picks
-          </Button>
+          {!isLocked && (
+            <Button fullWidth onClick={() => onNavigate('submit')}>
+              Submit My Picks
+            </Button>
+          )}
 
           <Button variant="secondary" fullWidth onClick={() => onNavigate('leaderboard')}>
             Leaderboard
@@ -242,12 +257,14 @@ function PoolHomeView({ pool, entries, onNavigate, inviteCode }) {
           </Button>
         </div>
 
-        <Card variant="dark">
-          <p className="text-green-200 text-sm mb-2">Share this pool:</p>
-          <Button variant="secondary" fullWidth onClick={copyShareLink}>
-            {copied ? '✓ Link Copied!' : '📋 Copy Share Link'}
-          </Button>
-        </Card>
+        {!isLocked && (
+          <Card variant="dark">
+            <p className="text-green-200 text-sm mb-2">Share this pool:</p>
+            <Button variant="secondary" fullWidth onClick={copyShareLink}>
+              {copied ? '✓ Link Copied!' : '📋 Copy Share Link'}
+            </Button>
+          </Card>
+        )}
       </div>
     </div>
   );
@@ -262,7 +279,22 @@ function SubmitView({ pool, teams, entries, onNavigate, inviteCode }) {
   const [error, setError] = useState('');
   const [existingUser, setExistingUser] = useState(null);
 
+  const isLocked = pool?.status === 'locked';
   const allTeams = [...(teams?.afc || []), ...(teams?.nfc || [])];
+
+  // Redirect if pool is locked
+  if (isLocked) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-900 to-green-800 p-4">
+        <div className="max-w-md mx-auto text-center pt-12">
+          <div className="text-6xl mb-4">🔒</div>
+          <h1 className="text-2xl font-bold text-white mb-2">Submissions Closed</h1>
+          <p className="text-green-200 mb-8">The playoffs have started. No new submissions are being accepted.</p>
+          <Button onClick={() => onNavigate('leaderboard')}>View Leaderboard</Button>
+        </div>
+      </div>
+    );
+  }
 
   // Check fingerprint on load
   useEffect(() => {
