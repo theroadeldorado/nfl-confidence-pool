@@ -29,10 +29,10 @@ const TeamBadge =
             isEliminated
               ? 0.3
               : 1,
-          scale:
+          transform:
             isEliminated
-              ? 0.8
-              : 1,
+              ? "scale(0.8)"
+              : "scale(1)",
         }}
         title={`${teamName}: ${points} pts${
           isEliminated
